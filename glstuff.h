@@ -360,7 +360,8 @@ inline void draw_cylinder(GLUquadric* q,
     double len;
 
     if (!setup_cylinder(p0, p1, len)) {
-    
+
+        glPopMatrix();
         return;
     
     } else {
@@ -434,10 +435,8 @@ inline void draw_capsule(GLUquadric* q,
     bool doclip = (clipplane >= GL_CLIP_PLANE0);
 
     if (!setup_cylinder(p0, p1, len)) {
-    
 
         gluSphere(q, rad, slices, sstacks);
-
     
     } else {
 

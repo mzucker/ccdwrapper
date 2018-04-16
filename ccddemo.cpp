@@ -168,7 +168,6 @@ public:
         glEnable(GL_CULL_FACE);
         glFrontFace(GL_CCW);
         
-
         camera.aim(vec3(0, 0, 6),
                    vec3(0, 0, 0),
                    vec3(0, 1, 0));
@@ -270,6 +269,8 @@ public:
     virtual void timer(int value) {
 
         if (animating) {
+
+            std::cerr << "updating transforms!\n";
 
             for (size_t i=0; i<objects.size(); ++i) {
 
@@ -395,6 +396,11 @@ public:
     
     virtual void display() {
 
+        //std::cout << "camera aim: " << camera.getMatrix(GlCamera::MATRIX_MODELVIEW) << "\n";
+        
+        glMatrixMode(GL_MODELVIEW);
+        camera.loadMatrix(GlCamera::MATRIX_MODELVIEW);
+        
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glPushAttrib(GL_POLYGON_BIT);
@@ -452,6 +458,7 @@ public:
                                 ri.pos2, ri.pos2 + 0.3 * ri.direction, 0.04f);
         }
 
+        
         glPushAttrib(GL_ENABLE_BIT);
         glDisable(GL_LIGHTING);
 
@@ -462,7 +469,8 @@ public:
 
             vec3 p;
             //vec3 fwd(camera.modelview().row(2).trunc());
-            vec3 fwd(camera.modelview().block(2,0,1,3));
+            vec4 f = camera.modelview().row(2);
+            vec3 fwd(f[0], f[1], f[2]);
 
             glPointSize(2.0);
             glBegin(GL_POINTS);

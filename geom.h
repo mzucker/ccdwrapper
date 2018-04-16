@@ -3,6 +3,7 @@
 
 #include <ccd/ccd.h>
 #include <Eigen/Geometry>
+#include <iostream>
 
 typedef Eigen::Matrix<ccd_real_t, 3, 1> vec3;
 typedef Eigen::Matrix<ccd_real_t, 4, 1> vec4;
