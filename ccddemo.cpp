@@ -39,29 +39,29 @@ void demo_motion(int x, int y);
 void demo_timer(int value);
 
 GlCamera::MouseMode btn2cam(int button) {
-  switch (button) {
-  case GLUT_LEFT_BUTTON: {
-    int mod = glutGetModifiers();
-    switch (mod) {
-    case 0:
-      return GlCamera::MOUSE_ROTATE;
-    case GLUT_ACTIVE_CTRL:
-      return GlCamera::MOUSE_ZOOM;
-    case GLUT_ACTIVE_SHIFT:
-      return GlCamera::MOUSE_PAN_XY;
+    switch (button) {
+    case GLUT_LEFT_BUTTON: {
+        int mod = glutGetModifiers();
+        switch (mod) {
+        case 0:
+            return GlCamera::MOUSE_ROTATE;
+        case GLUT_ACTIVE_CTRL:
+            return GlCamera::MOUSE_ZOOM;
+        case GLUT_ACTIVE_SHIFT:
+            return GlCamera::MOUSE_PAN_XY;
+        default:
+            break;
+        }
+        return GlCamera::MOUSE_NONE;
+    }
+    case GLUT_MIDDLE_BUTTON:
+        return GlCamera::MOUSE_ZOOM;
+    case GLUT_RIGHT_BUTTON:
+        return GlCamera::MOUSE_PAN_XY;
     default:
-      break;
+        break;
     }
     return GlCamera::MOUSE_NONE;
-  }
-  case GLUT_MIDDLE_BUTTON:
-    return GlCamera::MOUSE_ZOOM;
-  case GLUT_RIGHT_BUTTON:
-    return GlCamera::MOUSE_PAN_XY;
-  default:
-    break;
-  }
-  return GlCamera::MOUSE_NONE;
 }
 
 class CCDDemo {
@@ -118,7 +118,11 @@ public:
         const GLfloat lightdim[4] = { 0.3, 0.3, 0.3, 1.0 };
         const GLfloat lightbrt[4] = { 0.7, 0.7, 0.7, 1.0 };
         const GLfloat white[4] = { 1, 1, 1, 1 };
-        GLfloat position[4] = { p[0], p[1], p[2], p[3] };
+        GLfloat position[4];
+
+        for (int i=0; i<4; ++i) {
+            position[i] = GLfloat(p[i]);
+        }
 
         glEnable(GL_COLOR_MATERIAL);
         glEnable(GL_LIGHT0);
@@ -234,7 +238,7 @@ public:
             Convex* c1 = objects[i];
             for (size_t j=0; j<i; ++j) {
                 Convex* c2 = objects[j];
-                std::cerr << "querying " << *c1 << " against " << *c2 << "\n";
+                //std::cerr << "querying " << *c1 << " against " << *c2 << "\n";
                 bool collides = checker.query(qtype, &report, c1, c2, dmin);
                 ++queries;
                 if (collides) { 

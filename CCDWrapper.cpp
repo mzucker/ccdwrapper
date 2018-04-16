@@ -6,164 +6,164 @@
 
 namespace ccdw {
 
-  static inline vec3& ccd2mz(ccd_vec3_t* c) { 
+static inline vec3& ccd2mz(ccd_vec3_t* c) { 
     return *((vec3*)c); 
-  }
+}
 
-  static inline const vec3& ccd2mz(const ccd_vec3_t* c) { 
+static inline const vec3& ccd2mz(const ccd_vec3_t* c) { 
     return *((const vec3*)c); 
-  }
+}
 
-  static inline ccd_vec3_t* mz2ccd(vec3& v) { 
+static inline ccd_vec3_t* mz2ccd(vec3& v) { 
     return (ccd_vec3_t*)(&v); 
-  }
+}
 
-  static inline vec3 vabs(const vec3& v) {
+static inline vec3 vabs(const vec3& v) {
     return vec3(::fabs(v[0]), ::fabs(v[1]), ::fabs(v[2]));
-  }
+}
 
-  static inline vec3 vsgn(const vec3& v) {
+static inline vec3 vsgn(const vec3& v) {
     return vec3(ccdSign(v[0]), ccdSign(v[1]), ccdSign(v[2]));
-  }
+}
 
-  static inline vec3 vmin(const vec3& a, 
-                          const vec3& b) {
+static inline vec3 vmin(const vec3& a, 
+                        const vec3& b) {
     return vec3(std::min(a[0], b[0]),
                 std::min(a[1], b[1]),
                 std::min(a[2], b[2]));
-  }
+}
 
-  static inline vec3 vmax(const vec3& a, 
-                          const vec3& b) {
+static inline vec3 vmax(const vec3& a, 
+                        const vec3& b) {
     return vec3(std::max(a[0], b[0]),
                 std::max(a[1], b[1]),
                 std::max(a[2], b[2]));
-  }
+}
  
-  static inline int vargmin(const vec3& a) {
+static inline int vargmin(const vec3& a) {
     if (a[0] < a[1]) { 
-      // a1 not min
-      if (a[0] < a[2]) {
-        return 0;
-      } else {
-        return 2;
-      }
+        // a1 not min
+        if (a[0] < a[2]) {
+            return 0;
+        } else {
+            return 2;
+        }
     } else { 
-      // a0 not min
-      if (a[1] < a[2]) {
-        return 1;
-      } else {
-        return 2;
-      }
+        // a0 not min
+        if (a[1] < a[2]) {
+            return 1;
+        } else {
+            return 2;
+        }
     }
-  }
+}
 
-  static inline int vargmax(const vec3& a) {
+static inline int vargmax(const vec3& a) {
     if (a[0] > a[1]) { 
-      // a1 not max
-      if (a[0] > a[2]) {
-        return 0;
-      } else {
-        return 2;
-      }
+        // a1 not max
+        if (a[0] > a[2]) {
+            return 0;
+        } else {
+            return 2;
+        }
     } else { 
-      // a0 not max
-      if (a[1] > a[2]) {
-        return 1;
-      } else {
-        return 2;
-      }
+        // a0 not max
+        if (a[1] > a[2]) {
+            return 1;
+        } else {
+            return 2;
+        }
     }
-  }
+}
 
-  /*
+/*
   static inline const ccd_vec3_t* mz2ccd(const vec3& v) { 
-    return (const ccd_vec3_t*)(&v); 
+  return (const ccd_vec3_t*)(&v); 
   }
 
   static inline ccd_vec3_t* mz2ccd(vec3* v) { 
-    return (ccd_vec3_t*)(v); 
+  return (ccd_vec3_t*)(v); 
   }
 
   static inline const ccd_vec3_t* mz2ccd(const vec3* v) { 
-    return (const ccd_vec3_t*)(v); 
+  return (const ccd_vec3_t*)(v); 
   }
-  */
+*/
 
-  DrawHelper::DrawHelper(): 
+DrawHelper::DrawHelper(): 
     quadric(0),
     slices(32),
     sstacks(16),
     cstacks(1)
-  {}
+{}
 
-  DrawHelper::~DrawHelper() {
+DrawHelper::~DrawHelper() {
     if (quadric) { 
-      gluDeleteQuadric(quadric);
+        gluDeleteQuadric(quadric);
     }
-  }
+}
 
-  GLUquadric* DrawHelper::getQuadric() {
+GLUquadric* DrawHelper::getQuadric() {
     if (!quadric) {
-      quadric = gluNewQuadric();
+        quadric = gluNewQuadric();
     }
     return quadric;
-  }
+}
 
-  //////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
 
-  void support(const void* obj,
-               const ccd_vec3_t* dir,
-               ccd_vec3_t* vec) {
+void support(const void* obj,
+             const ccd_vec3_t* dir,
+             ccd_vec3_t* vec) {
 
     const Convex* c = (const Convex*)obj;
     assert( c );
     c->support( ccd2mz(dir), ccd2mz(vec) );
 
-  }
+}
   
-  void center(const void* obj,
-              ccd_vec3_t* center) {
+void center(const void* obj,
+            ccd_vec3_t* center) {
 
     const Convex* c = (const Convex*)obj;
     assert( c );
     
     c->center( ccd2mz(center) );
 
-  }
+}
 
-  //////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
 
-  Convex::~Convex() {}
+Convex::~Convex() {}
 
-  std::string Convex::description() const {
+std::string Convex::description() const {
     std::ostringstream ostr;
     describe(ostr);
     return ostr.str();
-  }
+}
     
 
-  void Convex::center(vec3& c) const {
-    c = vec3(0);
-  }
+void Convex::center(vec3& c) const {
+    c = vec3(0,0,0);
+}
 
-  bool Convex::isDilated() const {
+bool Convex::isDilated() const {
     return false;
-  }
+}
 
-  //////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
 
-  Box::Box(): extents(1) {}
+Box::Box(): extents(1) {}
 
-  Box::Box(const vec3& e): extents(e) {}
+Box::Box(const vec3& e): extents(e) {}
 
-  Box::~Box() {}
+Box::~Box() {}
 
-  void Box::describe(std::ostream& ostr) const {
-      ostr << "Box(" << extents.transpose() << ")";
-  }
+void Box::describe(std::ostream& ostr) const {
+    ostr << "Box(" << extents.transpose() << ")";
+}
 
-  bool Box::contains(const vec3& p, vec3* pc) const {
+bool Box::contains(const vec3& p, vec3* pc) const {
 
     // inside if abs(p[i]) <= 0.5*extents[i] for all i. 
     // outside if abs(p[i]) > 0.5*extents[i] for some i
@@ -182,245 +182,239 @@ namespace ccdw {
     bool inside = (c[i] >= 0);
 
     if (pc) {
-      if (inside) {
-        // copy original point but force axis closest to box onto boundary
-        *pc = p;
-        (*pc)[i] = ccdSign(p[i]) * b[i];
-      } else {
-        // clamp to box boundary
-        *pc = vmax(-b, vmin(p, b));
-      }
+        if (inside) {
+            // copy original point but force axis closest to box onto boundary
+            *pc = p;
+            (*pc)[i] = ccdSign(p[i]) * b[i];
+        } else {
+            // clamp to box boundary
+            *pc = vmax(-b, vmin(p, b));
+        }
     }
 
     return inside;
 
-  }
+}
   
 
-  /*
+/*
   void Box::closest(vec3& v) const {
 
-    bool inside = true;
+  bool inside = true;
 
-    vec3 absdists(0), vout(0);
-    int minaxis = 0;
+  vec3 absdists(0), vout(0);
+  int minaxis = 0;
     
-    for (int axis=0; axis<3; ++axis) {
-      if (v[axis] < -0.5*extents[axis]) {
-        inside = false;
-        v[axis] = -0.5*extents[axis];
-      } else if (v[axis] > 0.5*extents[axis]) {
-        inside = false;
-        v[axis] = 0.5*extents[axis];
-      } else {
-        if (v[axis] < 0) {
-          absdists[axis] = 0.5*extents[axis] + v[axis];
-          vout[axis] = -0.5*extents[axis];
-        } else {
-          absdists[axis] = 0.5*extents[axis] - v[axis];
-          vout[axis] = 0.5*extents[axis];
-        }
-        if (absdists[axis] < absdists[minaxis]) {
-          minaxis = axis;
-        }
-      }
-    }
+  for (int axis=0; axis<3; ++axis) {
+  if (v[axis] < -0.5*extents[axis]) {
+  inside = false;
+  v[axis] = -0.5*extents[axis];
+  } else if (v[axis] > 0.5*extents[axis]) {
+  inside = false;
+  v[axis] = 0.5*extents[axis];
+  } else {
+  if (v[axis] < 0) {
+  absdists[axis] = 0.5*extents[axis] + v[axis];
+  vout[axis] = -0.5*extents[axis];
+  } else {
+  absdists[axis] = 0.5*extents[axis] - v[axis];
+  vout[axis] = 0.5*extents[axis];
+  }
+  if (absdists[axis] < absdists[minaxis]) {
+  minaxis = axis;
+  }
+  }
+  }
 
-    if (inside) { 
-      v[minaxis] = vout[minaxis];
-    }
+  if (inside) { 
+  v[minaxis] = vout[minaxis];
+  }
 
   };
-  */
+*/
 
-  ccd_real_t Box::maxDist() const {
+ccd_real_t Box::maxDist() const {
     return 0.5*extents.norm();
-  }
+}
   
-  void Box::support(const vec3& dir, vec3& s) const {
+void Box::support(const vec3& dir, vec3& s) const {
 
     s = vec3( ccdSign(dir[0]) * extents[0] * 0.5,
               ccdSign(dir[1]) * extents[1] * 0.5,
               ccdSign(dir[2]) * extents[2] * 0.5 );
 
-  }
+}
 
-  /*
+/*
   static inline vec3 cwiseproduct(const vec3& a, const vec3& b) {
-    return vec3(a[0]*b[0], a[1]*b[1], a[2]*b[2]);
+  return vec3(a[0]*b[0], a[1]*b[1], a[2]*b[2]);
   }
-  */
+*/
 
-  void Box::render(DrawHelper& h, ccd_real_t dilation) const {
+void Box::render(DrawHelper& h, ccd_real_t dilation) const {
 
 
     Box3 box(-0.5*extents, 0.5*extents);
 
     if (dilation) {
 
-      glstuff::draw_round_box(box, dilation, h.slices, h.sstacks);
+        glstuff::draw_round_box(box, dilation, h.slices, h.sstacks);
       
     } else {
 
-      glstuff::draw_box( box );
+        glstuff::draw_box( box );
 
     }
 
-  }
+}
   
-  //////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
 
 
-  Point::Point() {}
+Point::Point() {}
 
-  Point::~Point() {}
+Point::~Point() {}
 
-  void Point::describe(std::ostream& ostr) const {
+void Point::describe(std::ostream& ostr) const {
     ostr << "Point()";
-  }
+}
 
-  /*
-  void Point::closest(vec3& v) const {
-    v = vec3(0);
-  }
-  */
-
-  ccd_real_t Point::maxDist() const {
+ccd_real_t Point::maxDist() const {
     return 0;
-  }
+}
 
-  void Point::support(const vec3& dir, vec3& s) const {
+void Point::support(const vec3& dir, vec3& s) const {
 
-    s = vec3(0);
+    s = vec3(0,0,0);
 
-  }
+}
 
-  void Point::render(DrawHelper& h, ccd_real_t dilation) const {
+void Point::render(DrawHelper& h, ccd_real_t dilation) const {
 
     if (dilation) {
-      gluSphere(h.getQuadric(), dilation, h.slices, h.sstacks);
+        gluSphere(h.getQuadric(), dilation, h.slices, h.sstacks);
     } else {
-      glPushAttrib(GL_ENABLE_BIT);
-      glDisable(GL_LIGHTING);
-      glBegin(GL_POINTS);
-      glVertex3f(0,0,0);
-      glEnd();
-      glPopAttrib();
+        glPushAttrib(GL_ENABLE_BIT);
+        glDisable(GL_LIGHTING);
+        glBegin(GL_POINTS);
+        glVertex3f(0,0,0);
+        glEnd();
+        glPopAttrib();
     }
 
-  }
+}
 
-  bool Point::contains(const vec3& p, vec3* pc) const {
-    if (pc) { *pc = vec3(0); }
+bool Point::contains(const vec3& p, vec3* pc) const {
+    if (pc) { *pc = vec3(0,0,0); }
     return p.norm() == 0;
-  }
+}
 
-  //////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
 
-  Line::Line(): length(1) {}
+Line::Line(): length(1) {}
 
-  Line::Line(ccd_real_t l): length(l) {}
+Line::Line(ccd_real_t l): length(l) {}
   
-  Line::~Line() {}
+Line::~Line() {}
 
-  void Line::describe(std::ostream& ostr) const {
+void Line::describe(std::ostream& ostr) const {
     ostr << "Line(" << length << ")";
-  }
+}
 
-  /*
+/*
   void Line::closest(vec3& v) const {
 
-    if (v[2] < -0.5*length) {
-      v[2] = -0.5*length;
-    } else if (v[2] > 0.5*length) {
-      v[2] = 0.5*length;
-    }
-    v[0] = v[1] = 0;
+  if (v[2] < -0.5*length) {
+  v[2] = -0.5*length;
+  } else if (v[2] > 0.5*length) {
+  v[2] = 0.5*length;
+  }
+  v[0] = v[1] = 0;
 
   }
-  */
+*/
 
-  ccd_real_t Line::maxDist() const {
+ccd_real_t Line::maxDist() const {
     return 0.5*length;
-  }
+}
 
-  void Line::support(const vec3& dir, vec3& s) const {
+void Line::support(const vec3& dir, vec3& s) const {
     s = vec3( 0, 0, ccdSign(dir[2]) * length * 0.5 );
-  }
+}
 
-  void Line::render(DrawHelper& h, ccd_real_t dilation) const {
+void Line::render(DrawHelper& h, ccd_real_t dilation) const {
 
     vec3 p0(0, 0, -0.5*length);
     vec3 p1(0, 0,  0.5*length);
 
     if (dilation) {
-      glstuff::draw_capsule(h.getQuadric(), p0, p1, dilation, 
-                            h.slices, h.sstacks, h.cstacks);
+        glstuff::draw_capsule(h.getQuadric(), p0, p1, dilation, 
+                              h.slices, h.sstacks, h.cstacks);
     } else {
-      glPushAttrib(GL_ENABLE_BIT);
-      glDisable(GL_LIGHTING);
-      glBegin(GL_LINES);
-      glstuff::vertex(p0);
-      glstuff::vertex(p1);
-      glEnd();
-      glPopAttrib();
+        glPushAttrib(GL_ENABLE_BIT);
+        glDisable(GL_LIGHTING);
+        glBegin(GL_LINES);
+        glstuff::vertex(p0);
+        glstuff::vertex(p1);
+        glEnd();
+        glPopAttrib();
     }
 
-  }
+}
     
-  bool Line::contains(const vec3& p, vec3* pc) const {
+bool Line::contains(const vec3& p, vec3* pc) const {
 
     if (pc) {
-      *pc = vec3(0, 0, 
-                 std::max(-ccd_real_t(0.5)*length, 
-                          std::min(ccd_real_t(0.5)*length, p.z())));
+        *pc = vec3(0, 0, 
+                   std::max(-ccd_real_t(0.5)*length, 
+                            std::min(ccd_real_t(0.5)*length, p.z())));
     }
 
     return ( p.x() == 0 && 
              p.y() == 0 && 
              fabs(p.z()) <= 0.5*length );
 
-  }
+}
 
-  //////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
 
 
-  Cylinder::Cylinder(): length(1), radius(0.5) {}
+Cylinder::Cylinder(): length(1), radius(0.5) {}
 
-  Cylinder::Cylinder(ccd_real_t l, ccd_real_t r): length(l), radius(r) {}
+Cylinder::Cylinder(ccd_real_t l, ccd_real_t r): length(l), radius(r) {}
   
-  Cylinder::~Cylinder() {}
+Cylinder::~Cylinder() {}
 
-  void Cylinder::describe(std::ostream& ostr) const {
+void Cylinder::describe(std::ostream& ostr) const {
     ostr << "Cylinder(" << length << ", " << radius << ")";
-  }
+}
 
-  ccd_real_t Cylinder::maxDist() const {
+ccd_real_t Cylinder::maxDist() const {
     return sqrt(0.25*length*length + radius*radius);
-  }
+}
 
-  void Cylinder::support(const vec3& dir, vec3& s) const {
-      //vec2_t<ccd_real_t> p = dir.trunc();
-      Eigen::Vector2d p(dir[0], dir[1]);
-      p *= (radius / p.norm());
-      s = vec3( p[0], p[1], ccdSign(dir[2]) * length * 0.5 );
-  }
+void Cylinder::support(const vec3& dir, vec3& s) const {
+    //vec2_t<ccd_real_t> p = dir.trunc();
+    Eigen::Vector2d p(dir[0], dir[1]);
+    p *= (radius / p.norm());
+    s = vec3( p[0], p[1], ccdSign(dir[2]) * length * 0.5 );
+}
 
-  void Cylinder::render(DrawHelper& h, ccd_real_t dilation) const {
+void Cylinder::render(DrawHelper& h, ccd_real_t dilation) const {
 
     vec3 p0(0, 0, -0.5*length);
     vec3 p1(0, 0,  0.5*length);
 
     if (dilation) {
-      // TODO: deal
+        // TODO: deal
     } else {
-      glstuff::draw_cylinder(h.getQuadric(), p0, p1, radius, 
-                             h.slices, h.cstacks);
+        glstuff::draw_cylinder(h.getQuadric(), p0, p1, radius, 
+                               h.slices, h.cstacks);
     }
 
-  }
+}
 
-  bool Cylinder::contains(const vec3& p, vec3* pc) const {
+bool Cylinder::contains(const vec3& p, vec3* pc) const {
 
     const ccd_real_t r2 = p.x()*p.x() + p.y()*p.y();
     const ccd_real_t az = fabs(p.z());
@@ -432,101 +426,101 @@ namespace ccdw {
 
     if (pc) {
 
-      ccd_real_t r = sqrt(r2);
+        ccd_real_t r = sqrt(r2);
 
-      if (inside) {
+        if (inside) {
 
-        ccd_real_t dr = radius - r;
-        ccd_real_t dz = az < hl;
+            ccd_real_t dr = radius - r;
+            ccd_real_t dz = az < hl;
 
-        if (dr < dz) {
+            if (dr < dz) {
 
-          // snap to radius
-          *pc = vec3(p.x()*radius/r,
-                     p.y()*radius/r,
-                     p.z());
+                // snap to radius
+                *pc = vec3(p.x()*radius/r,
+                           p.y()*radius/r,
+                           p.z());
+
+            } else {
+
+                // snap to top/bottom
+                *pc = vec3(p.x(), p.y(), p.z() < ccd_real_t(0) ? -hl : hl);
+
+            }
 
         } else {
 
-          // snap to top/bottom
-          *pc = vec3(p.x(), p.y(), p.z() < ccd_real_t(0) ? -hl : hl);
+            *pc = vec3(p.x()*radius/r, 
+                       p.y()*radius/r, 
+                       std::max(-hl, std::min(p.z(), hl)));
 
         }
-
-      } else {
-
-        *pc = vec3(p.x()*radius/r, 
-                   p.y()*radius/r, 
-                   std::max(-hl, std::min(p.z(), hl)));
-
-      }
     }
 
     return inside;
 
-  }
+}
 
-  //////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
 
-  DilatedConvex::DilatedConvex(): child(0), dilation(0) {}
+DilatedConvex::DilatedConvex(): child(0), dilation(0) {}
 
-  DilatedConvex::DilatedConvex(const Convex* c, ccd_real_t r): 
+DilatedConvex::DilatedConvex(const Convex* c, ccd_real_t r): 
     child(c), dilation(r) 
-  {
+{
     assert(child);
     assert(dilation > 0);
-  }
+}
 
-  DilatedConvex::~DilatedConvex() {}
+DilatedConvex::~DilatedConvex() {}
 
-  void DilatedConvex::describe(std::ostream& ostr) const {
+void DilatedConvex::describe(std::ostream& ostr) const {
     ostr << "DilatedConvex(";
     child->describe(ostr);
     ostr << ", " << dilation << ")";
-  }
+}
 
-  /*
+/*
   void DilatedConvex::closest(vec3& v) const {
-    assert(child);
-    assert(dilation > 0);
-    vec3 vc;
-    child->closest(vc);
-    vec3 dir = v - vc;
-    v = vc + dir * (dilation/dir.norm());
+  assert(child);
+  assert(dilation > 0);
+  vec3 vc;
+  child->closest(vc);
+  vec3 dir = v - vc;
+  v = vc + dir * (dilation/dir.norm());
   }
-  */
+*/
 
 
-  ccd_real_t DilatedConvex::maxDist() const {
+ccd_real_t DilatedConvex::maxDist() const {
     assert(child);
     assert(dilation > 0);
     return child->maxDist() + dilation;
-  }
+}
 
-  void DilatedConvex::support(const vec3& dir, vec3& s) const {
+void DilatedConvex::support(const vec3& dir, vec3& s) const {
     assert(child);
     assert(dilation > 0);
     child->support(dir, s);
     s += dir * (dilation / dir.norm());
-  }
+}
 
-  void DilatedConvex::render(DrawHelper& h, ccd_real_t extra) const {
+void DilatedConvex::render(DrawHelper& h, ccd_real_t extra) const {
     assert(child);
     child->render(h, dilation+extra);
-  }
+}
 
-  bool DilatedConvex::isDilated() const {
+bool DilatedConvex::isDilated() const {
     return true;
-  }
+}
 
-  bool DilatedConvex::contains(const vec3& p, vec3* pc) const {
+bool DilatedConvex::contains(const vec3& p, vec3* pc) const {
 
     vec3 cpc;
 
     bool inside_child = child->contains(p, &cpc);
 
     if (inside_child && !pc) {
-      return true;
+        return true;
     }
 
     vec3 cvec = p-cpc;
@@ -536,100 +530,100 @@ namespace ccdw {
     bool inside = inside_child || l2 < dilation*dilation;
 
     if (pc) {
-      cvec *= dilation / sqrt(l2);
-      if (inside_child) {
-          *pc -= cvec;
-      } else {
-          *pc += cvec;
-      }
+        cvec *= dilation / sqrt(l2);
+        if (inside_child) {
+            *pc -= cvec;
+        } else {
+            *pc += cvec;
+        }
     }
 
     return inside;
 
-  }
+}
 
-  //////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
 
-  TransformedConvex::TransformedConvex(): child(0) {}
+TransformedConvex::TransformedConvex(): child(0) {}
     
-  TransformedConvex::TransformedConvex(const Convex* c, const Transform3& x):
+TransformedConvex::TransformedConvex(const Convex* c, const Transform3& x):
     child(c), xform(x)
-  {
+{
     assert(child);
-  }
+}
 
-  TransformedConvex::~TransformedConvex() {}
+TransformedConvex::~TransformedConvex() {}
 
-  void TransformedConvex::describe(std::ostream& ostr) const {
+void TransformedConvex::describe(std::ostream& ostr) const {
     ostr << "TransformedConvex(";
     child->describe(ostr);
     ostr << ", " << "XFORM" << ")";
-  }
+}
 
-  /*
+/*
   void TransformedConvex::closest(vec3& v) const {
-    assert(child);
-    v = xform.transformInv(v);
-    child->closest(v);
-    v = xform.transformFwd(v);
+  assert(child);
+  v = xform.transformInv(v);
+  child->closest(v);
+  v = xform.transformFwd(v);
   }
-  */
+*/
 
-  ccd_real_t TransformedConvex::maxDist() const {
+ccd_real_t TransformedConvex::maxDist() const {
     assert(child);
     return child->maxDist();
-  }
+}
 
-  void TransformedConvex::support(const vec3& dir, vec3& s) const {
+void TransformedConvex::support(const vec3& dir, vec3& s) const {
     assert(child);
     child->support( xform.rotation().inverse()*dir, s );
     s = xform * s;
-  }
+}
 
-  void TransformedConvex::center(vec3& c) const {
+void TransformedConvex::center(vec3& c) const {
     assert(child);
     child->center(c);
     c = xform * c;
-  }
+}
 
-  void TransformedConvex::render(DrawHelper& h, ccd_real_t radius) const {
+void TransformedConvex::render(DrawHelper& h, ccd_real_t radius) const {
     assert(child);
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     glstuff::mult_transform(xform);
     child->render(h, radius);
     glPopMatrix();
-  }
+}
 
-  bool TransformedConvex::isDilated() const {
+bool TransformedConvex::isDilated() const {
     return child->isDilated();
-  }
+}
 
-  bool TransformedConvex::contains(const vec3& p, vec3* pc) const {
+bool TransformedConvex::contains(const vec3& p, vec3* pc) const {
 
     bool inside = child->contains(xform.transformInv(p), pc);
 
     if (pc) {
-      *pc = xform.transformFwd(*pc);
+        *pc = xform.transformFwd(*pc);
     }
 
     return inside;
 
-  }
+}
 
-  //////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
 
-  DilatedConvex* sphere(ccd_real_t radius) {
+DilatedConvex* sphere(ccd_real_t radius) {
     return new DilatedConvex(new Point(), radius);
-  }
+}
 
-  DilatedConvex* capsule(ccd_real_t length, ccd_real_t radius) {
+DilatedConvex* capsule(ccd_real_t length, ccd_real_t radius) {
     return new DilatedConvex(new Line(length), radius);
-  }
+}
 
-  TransformedConvex* capsule(const vec3& p0,
-                             const vec3& p1, 
-                             ccd_real_t radius) {
+TransformedConvex* capsule(const vec3& p0,
+                           const vec3& p1, 
+                           ccd_real_t radius) {
 
     vec3 z = p1-p0;
     ccd_real_t length = z.norm();
@@ -639,11 +633,11 @@ namespace ccdw {
     return transform(capsule(length, radius),
                      Transform3(quatFromOneVector(z), mid));
     
-  }
+}
 
-  TransformedConvex* cylinder(const vec3& p0,
-                              const vec3& p1, 
-                              ccd_real_t radius) {
+TransformedConvex* cylinder(const vec3& p0,
+                            const vec3& p1, 
+                            ccd_real_t radius) {
     
     vec3 z = p1-p0;
     ccd_real_t length = z.norm();
@@ -653,43 +647,43 @@ namespace ccdw {
     return transform(new Cylinder(length, radius),
                      Transform3(quatFromOneVector(z), mid));
     
-  }
+}
 
-  TransformedConvex* transform(const Convex* c, const Transform3& xform) {
+TransformedConvex* transform(const Convex* c, const Transform3& xform) {
 
     const TransformedConvex* t = dynamic_cast<const TransformedConvex*>(c);
 
     if (t) {
-      return transform(t->child, xform * t->xform);
+        return transform(t->child, xform * t->xform);
     } else {
-      return new TransformedConvex(c, xform);
+        return new TransformedConvex(c, xform);
     }
 
-  }
+}
 
-  Convex* dilate(const Convex* c, ccd_real_t radius) {
+Convex* dilate(const Convex* c, ccd_real_t radius) {
 
     const TransformedConvex* t = dynamic_cast<const TransformedConvex*>(c);
     
     if (t) {
-      return transform(dilate(t->child, radius), t->xform);
+        return transform(dilate(t->child, radius), t->xform);
     } else {
-      const DilatedConvex* d = dynamic_cast<const DilatedConvex*>(c);
-      if (d) {
-        return dilate(d->child, radius + d->dilation);
-      } else {
-        return new DilatedConvex(c, radius);
-      }
+        const DilatedConvex* d = dynamic_cast<const DilatedConvex*>(c);
+        if (d) {
+            return dilate(d->child, radius + d->dilation);
+        } else {
+            return new DilatedConvex(c, radius);
+        }
     }
 
-  }
+}
 
-  //////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
 
-  Report::Report(const Convex* a, const Convex* b): 
+Report::Report(const Convex* a, const Convex* b): 
     c1(a), c2(b), flags(0), distance(0), algorithm(NUM_ALGORITHMS) {}
 
-  Checker::Checker() {
+Checker::Checker() {
     CCD_INIT(&ccd);
     ccd.support1 = ccdw::support;
     ccd.support2 = ccdw::support;
@@ -697,41 +691,41 @@ namespace ccdw {
     ccd.center2 = ccdw::center;
     ccd.max_iterations = 1000;
     algorithm = ALGORITHM_MPR;
-  }
+}
 
-  bool Checker::intersect(const Convex* c1, const Convex* c2, 
-                           ccd_real_t dmin) const {
+bool Checker::intersect(const Convex* c1, const Convex* c2, 
+                        ccd_real_t dmin) const {
 
     return query(QUERY_INTERSECT, 0, c1, c2, dmin);
 
-  }
+}
   
-  bool Checker::separate(Report& report,
-                          const Convex* c1, const Convex* c2, 
-                          ccd_real_t dmin) const {
+bool Checker::separate(Report& report,
+                       const Convex* c1, const Convex* c2, 
+                       ccd_real_t dmin) const {
 
     return query(QUERY_SEPARATION, &report, c1, c2, dmin);
 
-  }
+}
   
-  bool Checker::penetration(Report& report,
-                             const Convex* c1, const Convex* c2,
-                             ccd_real_t dmin) const {
+bool Checker::penetration(Report& report,
+                          const Convex* c1, const Convex* c2,
+                          ccd_real_t dmin) const {
     
     return query(QUERY_PENETRATION, &report, c1, c2, dmin);
 
-  }
+}
   
-  bool Checker::query(QueryType qtype, Report* report,
-                         const Convex* orig_c1, const Convex* orig_c2,
-                         ccd_real_t dmin) const {
+bool Checker::query(QueryType qtype, Report* report,
+                    const Convex* orig_c1, const Convex* orig_c2,
+                    ccd_real_t dmin) const {
 
     assert( orig_c1 );
     assert( orig_c2 );
     assert( dmin >= 0 );
 
     if (report) {
-      *report = Report(orig_c1, orig_c2);
+        *report = Report(orig_c1, orig_c2);
     }
 
     // do bounding sphere test
@@ -745,7 +739,7 @@ namespace ccdw {
     ccd_real_t d = dmin + r1 + r2;
 
     if ((ctr2-ctr1).norm()  > d) {
-      return false;
+        return false;
     }
 
     const Convex* c1 = orig_c1;
@@ -758,97 +752,97 @@ namespace ccdw {
     const TransformedConvex* t2 = dynamic_cast<const TransformedConvex*>(orig_c2);
 
     if (t1 && t2) {
-      transformed = transform(t2->child, t1->xform.inverse() * t2->xform);
-      c1 = t1->child;
-      c2 = transformed;
+        transformed = transform(t2->child, t1->xform.inverse() * t2->xform);
+        c1 = t1->child;
+        c2 = transformed;
     }
 
 
 
     AlgorithmType actual_algorithm = algorithm;
     if (qtype == QUERY_SEPARATION) {
-      actual_algorithm = ALGORITHM_GJK;
+        actual_algorithm = ALGORITHM_GJK;
     }
 
     Convex* dilated1 = 0;
     Convex* dilated2 = 0;
 
     if (dmin) {
-      c1 = dilated1 = dilate(c1, 0.5*dmin);
-      c2 = dilated2 = dilate(c2, 0.5*dmin);
+        c1 = dilated1 = dilate(c1, 0.5*dmin);
+        c2 = dilated2 = dilate(c2, 0.5*dmin);
     }
 
     bool intersect = false;
 
     switch (qtype) {
     case QUERY_INTERSECT:
-      if (actual_algorithm == ALGORITHM_GJK) {
-        intersect = ccdGJKIntersect(c1, c2, &ccd);
-      } else {
-        intersect = ccdMPRIntersect(c1, c2, &ccd);
-      }
-      if (report && intersect) { 
-        report->flags = INTERSECT;
-      }
-      break;
+        if (actual_algorithm == ALGORITHM_GJK) {
+            intersect = ccdGJKIntersect(c1, c2, &ccd);
+        } else {
+            intersect = ccdMPRIntersect(c1, c2, &ccd);
+        }
+        if (report && intersect) { 
+            report->flags = INTERSECT;
+        }
+        break;
     case QUERY_SEPARATION: {
-      vec3 sep;
-      assert(actual_algorithm == ALGORITHM_GJK);
-      intersect = (ccdGJKSeparate(c1, c2, &ccd, mz2ccd(sep)) == 0);
-      if (report && intersect) {
+        vec3 sep;
+        assert(actual_algorithm == ALGORITHM_GJK);
+        intersect = (ccdGJKSeparate(c1, c2, &ccd, mz2ccd(sep)) == 0);
+        if (report && intersect) {
 
-        report->flags = INTERSECT | HAVE_SEPARATION;
+            report->flags = INTERSECT | HAVE_SEPARATION;
 
-        vec3 s1, s2;
-        c1->support( sep, s1);
-        c2->support(-sep, s2);
+            vec3 s1, s2;
+            c1->support( sep, s1);
+            c2->support(-sep, s2);
 
-        report->pos1 = s1;
-        report->pos2 = s2;
+            report->pos1 = s1;
+            report->pos2 = s2;
 
-        report->distance = sep.norm();
-        report->direction = sep / report->distance;
+            report->distance = sep.norm();
+            report->direction = sep / report->distance;
 
-      }
-      break;
+        }
+        break;
     }
     case QUERY_PENETRATION: {
-      ccd_real_t depth;
-      vec3 dir, pos;
-      if (actual_algorithm == ALGORITHM_GJK) {
-        intersect = (ccdGJKPenetration(c1, c2, &ccd, &depth, 
-                                       mz2ccd(dir), mz2ccd(pos)) == 0);
-      } else {
-        intersect = (ccdMPRPenetration(c1, c2, &ccd, &depth, 
-                                       mz2ccd(dir), mz2ccd(pos)) == 0);
-      }
-      if (report && intersect) {
-        report->flags = INTERSECT | HAVE_SEPARATION | HAVE_POSITION;
-        report->distance = depth;
-        report->direction = dir;
-        report->pos1 = pos + (0.5*depth)*dir;
-        report->pos2 = pos - (0.5*depth)*dir;
-      }
-      break;
+        ccd_real_t depth;
+        vec3 dir, pos;
+        if (actual_algorithm == ALGORITHM_GJK) {
+            intersect = (ccdGJKPenetration(c1, c2, &ccd, &depth, 
+                                           mz2ccd(dir), mz2ccd(pos)) == 0);
+        } else {
+            intersect = (ccdMPRPenetration(c1, c2, &ccd, &depth, 
+                                           mz2ccd(dir), mz2ccd(pos)) == 0);
+        }
+        if (report && intersect) {
+            report->flags = INTERSECT | HAVE_SEPARATION | HAVE_POSITION;
+            report->distance = depth;
+            report->direction = dir;
+            report->pos1 = pos + (0.5*depth)*dir;
+            report->pos2 = pos - (0.5*depth)*dir;
+        }
+        break;
     }
     default:
-      break;
+        break;
     };
 
     if (transformed && report) {
-      report->pos1 = t1->xform * report->pos1;
-      report->pos2 = t1->xform * report->pos2;
-      report->direction = t1->xform.rotation() * report->direction;
+        report->pos1 = t1->xform * report->pos1;
+        report->pos2 = t1->xform * report->pos2;
+        report->direction = t1->xform.rotation() * report->direction;
     }
 
     if (dmin && report) {
-      report->pos1 -= 0.5*dmin*report->direction;
-      report->pos2 += 0.5*dmin*report->direction;
-      report->distance -= dmin;
+        report->pos1 -= 0.5*dmin*report->direction;
+        report->pos2 += 0.5*dmin*report->direction;
+        report->distance -= dmin;
     }
 
     if (report) {
-      report->algorithm = actual_algorithm;
+        report->algorithm = actual_algorithm;
     }
 
     delete dilated1;
@@ -858,42 +852,42 @@ namespace ccdw {
     
     return intersect;
 
-  }
+}
 
-  //////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
 
-  static inline ccd_real_t frac(size_t i, size_t n) {
+static inline ccd_real_t frac(size_t i, size_t n) {
     return ccd_real_t(i) / ccd_real_t(n-1);
-  }
+}
 
-  void cubePoints(size_t n, std::vector<vec3>& points) {
+void cubePoints(size_t n, std::vector<vec3>& points) {
 
     points.clear();
 
     
     for (int side=0; side<6; ++side) {
 
-      int ax0 = (side + 0) % 3;
-      int ax1 = (side + 1) % 3;
-      int ax2 = (side + 2) % 3;
+        int ax0 = (side + 0) % 3;
+        int ax1 = (side + 1) % 3;
+        int ax2 = (side + 2) % 3;
 
-      int sign = (side / 3) ? -1 : 1;
+        int sign = (side / 3) ? -1 : 1;
       
-      vec3 p;
+        vec3 p;
       
-      p[ax0] = sign;
+        p[ax0] = sign;
 
-      for (size_t u=0; u<n; ++u) {
-        p[ax1] = sign*(frac(u, n)*2-1);
-        for (size_t v=0; v<n; ++v) {
-          p[ax2] = sign*(frac(v, n)*2-1);
-          points.push_back(p);
+        for (size_t u=0; u<n; ++u) {
+            p[ax1] = sign*(frac(u, n)*2-1);
+            for (size_t v=0; v<n; ++v) {
+                p[ax2] = sign*(frac(v, n)*2-1);
+                points.push_back(p);
+            }
         }
-      }
 
     }
 
-  }
+}
 
 
 }
