@@ -1,5 +1,5 @@
-#ifndef _GEOM_H_
-#define _GEOM_H_
+#ifndef _CCD_EIGEN_H_
+#define _CCD_EIGEN_H_
 
 #include <ccd/ccd.h>
 #include <Eigen/Geometry>
@@ -108,8 +108,8 @@ public:
     
 };
 
-static inline quat quatFromTwoVectors(const vec3& yy,
-                                      const vec3& z) {
+inline quat quatFromTwoVectors(const vec3& yy,
+                               const vec3& z) {
 
     vec3 x = yy.cross(z);
     vec3 y = z.cross(x);
@@ -123,7 +123,7 @@ static inline quat quatFromTwoVectors(const vec3& yy,
 
 }
 
-static inline quat quatFromOneVector(const vec3& z) {
+inline quat quatFromOneVector(const vec3& z) {
 
     int maxaxis = 0;
     if (fabs(z[1]) > fabs(z[maxaxis])) { maxaxis = 1; }
@@ -136,11 +136,17 @@ static inline quat quatFromOneVector(const vec3& z) {
 
 }
 
-static inline quat quatFromAxisAngle(const vec3& axis,
-                                     double angle) {
+inline quat quatFromAxisAngle(const vec3& axis,
+                              double angle) {
 
     return quat(Eigen::AngleAxisd(angle, axis));
     
+}
+
+inline quat quatFromOmega(const vec3& v) {
+    double l = v.norm();
+    vec3 vn = v / l; 
+    return quat(Eigen::AngleAxisd(l, vn));
 }
 
 #endif

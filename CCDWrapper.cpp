@@ -22,10 +22,12 @@ static inline vec3 vabs(const vec3& v) {
     return vec3(::fabs(v[0]), ::fabs(v[1]), ::fabs(v[2]));
 }
 
+    /*
 static inline vec3 vsgn(const vec3& v) {
     return vec3(ccdSign(v[0]), ccdSign(v[1]), ccdSign(v[2]));
 }
-
+    */
+    
 static inline vec3 vmin(const vec3& a, 
                         const vec3& b) {
     return vec3(std::min(a[0], b[0]),
@@ -58,6 +60,7 @@ static inline int vargmin(const vec3& a) {
     }
 }
 
+    /*
 static inline int vargmax(const vec3& a) {
     if (a[0] > a[1]) { 
         // a1 not max
@@ -75,40 +78,19 @@ static inline int vargmax(const vec3& a) {
         }
     }
 }
+    */
 
-/*
-  static inline const ccd_vec3_t* mz2ccd(const vec3& v) { 
-  return (const ccd_vec3_t*)(&v); 
-  }
+//////////////////////////////////////////////////////////////////////
 
-  static inline ccd_vec3_t* mz2ccd(vec3* v) { 
-  return (ccd_vec3_t*)(v); 
-  }
+void ConvexConstVisitor::visit(const Convex* c) {}
+void ConvexConstVisitor::visit(const Point* c) {}
+void ConvexConstVisitor::visit(const Line* c) {}
+void ConvexConstVisitor::visit(const Box* c) {}
+void ConvexConstVisitor::visit(const Cylinder* c) {}
+void ConvexConstVisitor::visit(const DilatedConvex* c) {}
+void ConvexConstVisitor::visit(const TransformedConvex* c) {}
 
-  static inline const ccd_vec3_t* mz2ccd(const vec3* v) { 
-  return (const ccd_vec3_t*)(v); 
-  }
-*/
-
-DrawHelper::DrawHelper(): 
-    quadric(0),
-    slices(32),
-    sstacks(16),
-    cstacks(1)
-{}
-
-DrawHelper::~DrawHelper() {
-    if (quadric) { 
-        gluDeleteQuadric(quadric);
-    }
-}
-
-GLUquadric* DrawHelper::getQuadric() {
-    if (!quadric) {
-        quadric = gluNewQuadric();
-    }
-    return quadric;
-}
+ConvexConstVisitor::~ConvexConstVisitor() {}
 
 //////////////////////////////////////////////////////////////////////
 
@@ -149,6 +131,10 @@ void Convex::center(vec3& c) const {
 
 bool Convex::isDilated() const {
     return false;
+}
+
+void Convex::accept(ConvexConstVisitor* v) const {
+    v->visit(this);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -245,28 +231,17 @@ void Box::support(const vec3& dir, vec3& s) const {
 
 }
 
+void Box::accept(ConvexConstVisitor* v) const {
+    v->visit(this);
+}
+    
+
 /*
   static inline vec3 cwiseproduct(const vec3& a, const vec3& b) {
   return vec3(a[0]*b[0], a[1]*b[1], a[2]*b[2]);
   }
 */
 
-void Box::render(DrawHelper& h, ccd_real_t dilation) const {
-
-
-    Box3 box(-0.5*extents, 0.5*extents);
-
-    if (dilation) {
-
-        glstuff::draw_round_box(box, dilation, h.slices, h.sstacks);
-      
-    } else {
-
-        glstuff::draw_box( box );
-
-    }
-
-}
   
 //////////////////////////////////////////////////////////////////////
 
@@ -289,25 +264,16 @@ void Point::support(const vec3& dir, vec3& s) const {
 
 }
 
-void Point::render(DrawHelper& h, ccd_real_t dilation) const {
-
-    if (dilation) {
-        gluSphere(h.getQuadric(), dilation, h.slices, h.sstacks);
-    } else {
-        glPushAttrib(GL_ENABLE_BIT);
-        glDisable(GL_LIGHTING);
-        glBegin(GL_POINTS);
-        glVertex3f(0,0,0);
-        glEnd();
-        glPopAttrib();
-    }
-
-}
 
 bool Point::contains(const vec3& p, vec3* pc) const {
     if (pc) { *pc = vec3(0,0,0); }
     return p.norm() == 0;
 }
+
+void Point::accept(ConvexConstVisitor* v) const {
+    v->visit(this);
+}
+    
 
 //////////////////////////////////////////////////////////////////////
 
@@ -342,25 +308,6 @@ void Line::support(const vec3& dir, vec3& s) const {
     s = vec3( 0, 0, ccdSign(dir[2]) * length * 0.5 );
 }
 
-void Line::render(DrawHelper& h, ccd_real_t dilation) const {
-
-    vec3 p0(0, 0, -0.5*length);
-    vec3 p1(0, 0,  0.5*length);
-
-    if (dilation) {
-        glstuff::draw_capsule(h.getQuadric(), p0, p1, dilation, 
-                              h.slices, h.sstacks, h.cstacks);
-    } else {
-        glPushAttrib(GL_ENABLE_BIT);
-        glDisable(GL_LIGHTING);
-        glBegin(GL_LINES);
-        glstuff::vertex(p0);
-        glstuff::vertex(p1);
-        glEnd();
-        glPopAttrib();
-    }
-
-}
     
 bool Line::contains(const vec3& p, vec3* pc) const {
 
@@ -375,6 +322,11 @@ bool Line::contains(const vec3& p, vec3* pc) const {
              fabs(p.z()) <= 0.5*length );
 
 }
+
+void Line::accept(ConvexConstVisitor* v) const {
+    v->visit(this);
+}
+    
 
 //////////////////////////////////////////////////////////////////////
 
@@ -400,19 +352,6 @@ void Cylinder::support(const vec3& dir, vec3& s) const {
     s = vec3( p[0], p[1], ccdSign(dir[2]) * length * 0.5 );
 }
 
-void Cylinder::render(DrawHelper& h, ccd_real_t dilation) const {
-
-    vec3 p0(0, 0, -0.5*length);
-    vec3 p1(0, 0,  0.5*length);
-
-    if (dilation) {
-        // TODO: deal
-    } else {
-        glstuff::draw_cylinder(h.getQuadric(), p0, p1, radius, 
-                               h.slices, h.cstacks);
-    }
-
-}
 
 bool Cylinder::contains(const vec3& p, vec3* pc) const {
 
@@ -460,6 +399,10 @@ bool Cylinder::contains(const vec3& p, vec3* pc) const {
 
 }
 
+void Cylinder::accept(ConvexConstVisitor* v) const {
+    v->visit(this);
+}
+
 //////////////////////////////////////////////////////////////////////
 
 DilatedConvex::DilatedConvex(): child(0), dilation(0) {}
@@ -504,10 +447,6 @@ void DilatedConvex::support(const vec3& dir, vec3& s) const {
     s += dir * (dilation / dir.norm());
 }
 
-void DilatedConvex::render(DrawHelper& h, ccd_real_t extra) const {
-    assert(child);
-    child->render(h, dilation+extra);
-}
 
 bool DilatedConvex::isDilated() const {
     return true;
@@ -542,6 +481,10 @@ bool DilatedConvex::contains(const vec3& p, vec3* pc) const {
 
 }
 
+void DilatedConvex::accept(ConvexConstVisitor* v) const {
+    v->visit(this);
+}
+    
 //////////////////////////////////////////////////////////////////////
 
 TransformedConvex::TransformedConvex(): child(0) {}
@@ -586,14 +529,6 @@ void TransformedConvex::center(vec3& c) const {
     c = xform * c;
 }
 
-void TransformedConvex::render(DrawHelper& h, ccd_real_t radius) const {
-    assert(child);
-    glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
-    glstuff::mult_transform(xform);
-    child->render(h, radius);
-    glPopMatrix();
-}
 
 bool TransformedConvex::isDilated() const {
     return child->isDilated();
@@ -610,6 +545,11 @@ bool TransformedConvex::contains(const vec3& p, vec3* pc) const {
     return inside;
 
 }
+
+void TransformedConvex::accept(ConvexConstVisitor* v) const {
+    v->visit(this);
+}
+
 
 //////////////////////////////////////////////////////////////////////
 

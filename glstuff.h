@@ -22,7 +22,7 @@
 #endif
 #endif
 
-#include "geom.h"
+#include "ccd_eigen.h"
 
 namespace glstuff {
 

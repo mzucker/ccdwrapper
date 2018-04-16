@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <string>
-#include "glstuff.h"
+#include "ccd_eigen.h"
 
 namespace ccdw {
 
@@ -14,17 +14,32 @@ void support(const void* obj,
 void center(const void* obj,
             ccd_vec3_t* center);
 
-class DrawHelper {
+class Convex;
+class Point;
+class Line;
+class Box;
+class Cylinder;
+class DilatedConvex;
+class TransformedConvex;
+
+// useful for stuff like rendering so we can decouple
+// hierarchy traversal from this file
+// https://en.wikipedia.org/wiki/Visitor_pattern
+class ConvexConstVisitor {
 public:
-    GLUquadric* quadric;
-    int slices;
-    int sstacks;
-    int cstacks;
-    DrawHelper();
-    ~DrawHelper();
-    GLUquadric* getQuadric();
+
+    virtual void visit(const Convex* c);
+    virtual void visit(const Point* c);
+    virtual void visit(const Line* c);
+    virtual void visit(const Box* c);
+    virtual void visit(const Cylinder* c);
+    virtual void visit(const DilatedConvex* c);
+    virtual void visit(const TransformedConvex* c);
+
+    virtual ~ConvexConstVisitor();
+    
 };
-  
+    
 //////////////////////////////////////////////////////////////////////
 
 class Convex {
@@ -44,9 +59,9 @@ public:
 
     virtual bool isDilated() const;
 
-    virtual void render(DrawHelper& h, ccd_real_t radius=0) const =0;
-
     virtual bool contains(const vec3& p, vec3* pc) const =0;
+
+    virtual void accept(ConvexConstVisitor* v) const;
 
 };
 
@@ -71,9 +86,10 @@ public:
     virtual void describe(std::ostream& ostr) const;
     virtual ccd_real_t maxDist() const;
     virtual void support(const vec3& dir, vec3& s) const;
-    virtual void render(DrawHelper& h, ccd_real_t radius=0) const;
     virtual bool contains(const vec3& p, vec3* pc) const;
 
+    virtual void accept(ConvexConstVisitor* v) const;
+    
 };
 
 //////////////////////////////////////////////////////////////////////
@@ -88,9 +104,10 @@ public:
     virtual void describe(std::ostream& ostr) const;
     virtual ccd_real_t maxDist() const;
     virtual void support(const vec3& dir, vec3& s) const;
-    virtual void render(DrawHelper& h, ccd_real_t radius=0) const;
     virtual bool contains(const vec3& p, vec3* pc) const;
 
+    virtual void accept(ConvexConstVisitor* v) const;
+    
 };
 
 //////////////////////////////////////////////////////////////////////
@@ -108,9 +125,10 @@ public:
     virtual void describe(std::ostream& ostr) const;
     virtual ccd_real_t maxDist() const;
     virtual void support(const vec3& dir, vec3& s) const;
-    virtual void render(DrawHelper& h, ccd_real_t radius=0) const;
     virtual bool contains(const vec3& p, vec3* pc) const;
 
+    virtual void accept(ConvexConstVisitor* v) const;
+    
 };
 
 //////////////////////////////////////////////////////////////////////
@@ -129,8 +147,9 @@ public:
     virtual void describe(std::ostream& ostr) const;
     virtual ccd_real_t maxDist() const;
     virtual void support(const vec3& dir, vec3& s) const;
-    virtual void render(DrawHelper& h, ccd_real_t radius=0) const;
     virtual bool contains(const vec3& p, vec3* pc) const;
+
+    virtual void accept(ConvexConstVisitor* v) const;
 
 };
 
@@ -150,10 +169,11 @@ public:
     virtual void describe(std::ostream& ostr) const;
     virtual ccd_real_t maxDist() const;
     virtual void support(const vec3& dir, vec3& s) const;
-    virtual void render(DrawHelper& h, ccd_real_t radius=0) const;
     virtual bool isDilated() const;
     virtual bool contains(const vec3& p, vec3* pc) const;
 
+    virtual void accept(ConvexConstVisitor* v) const;
+    
 };
 
 //////////////////////////////////////////////////////////////////////
@@ -173,9 +193,10 @@ public:
     virtual ccd_real_t maxDist() const;
     virtual void support(const vec3& dir, vec3& s) const;
     virtual void center(vec3& c) const;
-    virtual void render(DrawHelper& h, ccd_real_t radius=0) const;
     virtual bool isDilated() const;
     virtual bool contains(const vec3& p, vec3* pc) const;
+
+    virtual void accept(ConvexConstVisitor* v) const;
 
 };
 

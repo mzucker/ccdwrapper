@@ -28,5 +28,5 @@ pkg_search_module(CCD REQUIRED libccd ccd)
 set(CMAKE_C_FLAGS "-Wall -g")
 set(CMAKE_CXX_FLAGS "-Wall -g")
 
-add_executable(ccddemo ccddemo.cpp CCDWrapper.cpp GlCamera.cpp)
+add_executable(ccddemo ccddemo.cpp CCDWrapper.cpp GlCamera.cpp DrawHelper.cpp)
 target_link_libraries(ccddemo ${GLUT_LIBRARY} ${CCD_LIBRARIES} ${OPENGL_LIBRARY})

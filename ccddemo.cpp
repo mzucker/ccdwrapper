@@ -1,5 +1,7 @@
-#include "CCDWrapper.h"
 #include "GlCamera.h"
+#include "DrawHelper.h"
+#include <sys/time.h>
+
 #include <sstream>
 #include <iostream>
 
@@ -37,6 +39,16 @@ void demo_keyboard(unsigned char key, int x, int y);
 void demo_mouse(int button, int state, int x, int y);
 void demo_motion(int x, int y);
 void demo_timer(int value);
+
+double gettime() {
+
+    struct timeval tv;
+
+    gettimeofday(&tv, NULL);
+
+    return double(tv.tv_sec) + double(tv.tv_usec) * 1e-6;
+
+}
 
 GlCamera::MouseMode btn2cam(int button) {
     switch (button) {
@@ -231,7 +243,7 @@ public:
         Report report;
 
         size_t queries = 0;
-        //TimeStamp start = TimeStamp::now();
+        double start = gettime();
 
         for (size_t i=0; i<objects.size(); ++i) {
             Convex* c1 = objects[i];
@@ -249,9 +261,7 @@ public:
             }
         }
 
-        //TimeStamp end = TimeStamp::now();
-        //double elapsed = (end-start).toDouble();
-        double elapsed = 0;
+        double elapsed = gettime() - start;
 
         if (1) {
             std::cout << "did " << queries << " queries in " << elapsed << "s. "
@@ -260,17 +270,9 @@ public:
 
     }
 
-    static quat fromOmega(const vec3& v) {
-        double l = v.norm();
-        vec3 vn = v / l; 
-        return quat(Eigen::AngleAxisd(l, vn));
-    }
-
     virtual void timer(int value) {
 
         if (animating) {
-
-            std::cerr << "updating transforms!\n";
 
             for (size_t i=0; i<objects.size(); ++i) {
 
@@ -280,7 +282,7 @@ public:
                 vec3 p = c->xform.translation();
 
                 p += pos_rate[i];
-                q = fromOmega(rot_rate[i]) * q;
+                q = quatFromOmega(rot_rate[i]) * q;
 
                 for (int axis=0; axis<3; ++axis) {
                     if ( (p[axis] > arena_radius && pos_rate[i][axis] > 0) ||
@@ -396,8 +398,6 @@ public:
     
     virtual void display() {
 
-        //std::cout << "camera aim: " << camera.getMatrix(GlCamera::MATRIX_MODELVIEW) << "\n";
-        
         glMatrixMode(GL_MODELVIEW);
         camera.loadMatrix(GlCamera::MATRIX_MODELVIEW);
         
@@ -419,7 +419,7 @@ public:
                 color *= 0.75;
             }
             glColor3dv(&color[0]);
-            objects[i]->render(helper);
+            helper.render(objects[i]);
         }
 
         glPopAttrib();
